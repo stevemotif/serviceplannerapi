@@ -11,14 +11,16 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
-const a= async ()=>{
-try {
-  await sequelize.authenticate();
-  console.log('Connection has been established successfully.');
-} catch (error) {
-  console.error('Unable to connect to the database:', error);
-}}
-a()
 db.church = require('./church.model')(sequelize, Sequelize);
+
+(async () => {
+  try {
+    await sequelize.sync({ alter: true });
+    console.log('Database synchronized successfully.');
+  } catch (error) {
+    console.error('Error synchronizing the database:', error);
+  }
+})();
+
 
 module.exports = db;
