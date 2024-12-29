@@ -6,7 +6,9 @@ const app = express();
 app.use(bodyParser.json());
 
 const churchRoutes = require('./routes/church.routes');
+const roleRoutes = require('./routes/role.routes');
 app.use('/api/church', churchRoutes);
+app.use('/api/role', roleRoutes);
 
 db.sequelize.sync({ force: false }).then(() => {
   console.log('Database synchronized successfully.');

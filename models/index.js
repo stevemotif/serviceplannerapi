@@ -12,6 +12,7 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 db.church = require('./church.model')(sequelize, Sequelize);
+db.role = require('./role.model')(sequelize, Sequelize);
 
 (async () => {
   try {
