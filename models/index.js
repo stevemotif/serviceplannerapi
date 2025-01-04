@@ -13,6 +13,10 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 db.church = require('./church.model')(sequelize, Sequelize);
 db.role = require('./role.model')(sequelize, Sequelize);
+db.member = require('./member.model')(sequelize, Sequelize);
+
+db.role.hasMany(db.member, { foreignKey: "roleId", as: "members" });
+db.member.belongsTo(db.role, { foreignKey: "roleId", as: "role" });
 
 (async () => {
   try {
