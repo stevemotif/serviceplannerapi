@@ -23,13 +23,6 @@ db.member.belongsTo(db.role, { foreignKey: "roleId", as: "role" });
 db.section.hasMany(db.item, { foreignKey: "sectionId", as: "items" });
 db.item.belongsTo(db.section, { foreignKey: "sectionId", as: "section" });
 
-console.log(
-  dbConfig.DB,
-  dbConfig.USER,
-  dbConfig.PASSWORD,
-  dbConfig.HOST,
-  "aaaaaa"
-);
 // (async () => {
 //   try {
 //     await sequelize.sync({ alter: true });

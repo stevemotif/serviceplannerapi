@@ -1,8 +1,10 @@
+const express = require("express");
+const router = express.Router();
 const services = require("../controllers/service.controller");
 
-module.exports = (app) => {
-  app.post("/", services.create);
-  app.get("/all", services.findAll);
-  app.put("/:id", services.update);
-  app.delete("/:id", services.delete);
-};
+router.post("/", services.create);
+router.get("/all", services.findAll);
+router.put("/:id", services.update);
+router.delete("/:id", services.delete);
+
+module.exports = router;
