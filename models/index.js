@@ -29,13 +29,14 @@ console.log(
   dbConfig.PASSWORD,
   dbConfig.HOST,
   "aaaaaa"
-)(async () => {
-  try {
-    await sequelize.sync({ alter: true });
-    console.log("Database synchronized successfully.");
-  } catch (error) {
-    console.error("Error synchronizing the database:", error);
-  }
-})();
+);
+// (async () => {
+//   try {
+//     await sequelize.sync({ alter: true });
+//     console.log("Database synchronized successfully.");
+//   } catch (error) {
+//     console.error("Error synchronizing the database:", error);
+//   }
+// })();
 
 module.exports = db;
