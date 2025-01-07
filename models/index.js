@@ -3,7 +3,6 @@ const dbConfig = require("../config/db.config");
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
-  // port: dbConfig.PORT,
   operatorsAliases: 0,
   dialect: "mysql",
   dialectModule: require("mysql2"),
@@ -24,7 +23,13 @@ db.member.belongsTo(db.role, { foreignKey: "roleId", as: "role" });
 db.section.hasMany(db.item, { foreignKey: "sectionId", as: "items" });
 db.item.belongsTo(db.section, { foreignKey: "sectionId", as: "section" });
 
-(async () => {
+console.log(
+  dbConfig.DB,
+  dbConfig.USER,
+  dbConfig.PASSWORD,
+  dbConfig.HOST,
+  "aaaaaa"
+)(async () => {
   try {
     await sequelize.sync({ alter: true });
     console.log("Database synchronized successfully.");
