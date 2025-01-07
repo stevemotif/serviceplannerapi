@@ -19,6 +19,12 @@ app.use("/api/section", sectionRoutes);
 app.use("/api/item", itemRoutes);
 app.use("/api/service", serviceRoutes);
 
+app.get("/", (req, res) => {
+  res.send(
+    "<div style='display:flex; justify-content:center;align-items:center;height:100vh;font-size:30px;color: steelblue; font-weight:bold; ' >Service Planner Backend</div>"
+  );
+});
+
 db.sequelize.sync({ force: false }).then(() => {
   console.log("Database synchronized successfully.");
 });
