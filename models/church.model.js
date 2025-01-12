@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const Church = sequelize.define('Church', {
+  const Church = sequelize.define("Church", {
     churchId: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
@@ -9,6 +9,15 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+    },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
     },
   });
 

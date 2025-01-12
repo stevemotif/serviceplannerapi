@@ -3,11 +3,15 @@ const Church = db.church;
 
 exports.create = async (req, res) => {
   try {
-    const { churchName } = req.body;
-    if (!churchName) {
-      return res.status(400).send({ message: "Church name is required!" });
+    const { churchName, address, isActive } = req.body;
+
+    if (!churchName || !address) {
+      return res
+        .status(400)
+        .send({ message: "Church name and address are required!" });
     }
-    const church = await Church.create({ churchName });
+
+    const church = await Church.create({ churchName, address, isActive });
     res.status(201).send(church);
   } catch (error) {
     console.log(error);
@@ -31,14 +35,16 @@ exports.findAll = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { churchName } = req.body;
+    const { churchName, address, isActive } = req.body;
 
-    if (!churchName) {
-      return res.status(400).send({ message: "Church name is required!" });
+    if (!churchName || !address) {
+      return res
+        .status(400)
+        .send({ message: "Church name and address are required!" });
     }
 
     const [updated] = await Church.update(
-      { churchName },
+      { churchName, address, isActive },
       { where: { churchId: id } }
     );
 
@@ -61,15 +67,18 @@ exports.delete = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const deleted = await Church.destroy({ where: { churchId: id } });
-
-    if (deleted) {
-      res
-        .status(200)
-        .send({ message: `Church with ID ${id} deleted successfully.` });
-    } else {
-      res.status(404).send({ message: `Church with ID ${id} not found.` });
+    const church = await Church.findByPk(id);
+    if (!church) {
+      return res
+        .status(404)
+        .send({ message: `Church with ID ${id} not found.` });
     }
+
+    await Church.destroy({ where: { churchId: id } });
+
+    res
+      .status(200)
+      .send({ message: `${church.churchName} deleted successfully.` });
   } catch (error) {
     res.status(500).send({ message: error.message });
   }

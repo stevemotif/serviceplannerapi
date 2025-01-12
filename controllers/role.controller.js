@@ -64,13 +64,14 @@ exports.update = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
     const { id } = req.params;
-    const deleted = await Role.destroy({ where: { id } });
-
-    if (deleted) {
-      res.status(200).send({ message: "Role deleted successfully." });
-    } else {
-      res.status(404).send({ message: `Role with ID ${id} not found.` });
+    const role = await Role.findByPk(id);
+    if (!role) {
+      return res.status(404).send({ message: `Role with ID ${id} not found.` });
     }
+
+    await Role.destroy({ where: { id } });
+
+    res.status(200).send({ message: `${role.roleName} deleted successfully.` });
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
