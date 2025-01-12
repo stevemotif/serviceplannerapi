@@ -10,9 +10,20 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true,
     },
-    description: {
+    notes: {
       type: DataTypes.TEXT,
       allowNull: true,
+    },
+    link: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        isUrl: true,
+      },
+    },
+    time: {
+      type: DataTypes.TIME,
+      allowNull: false,
     },
     sectionId: {
       type: DataTypes.INTEGER,

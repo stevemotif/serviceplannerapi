@@ -3,13 +3,15 @@ const Section = db.section;
 
 exports.create = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, time } = req.body;
 
-    if (!name) {
-      return res.status(400).send({ message: "Section name is required!" });
+    if (!name || !time) {
+      return res
+        .status(400)
+        .send({ message: "Section name and time are required!" });
     }
 
-    const section = await Section.create({ name });
+    const section = await Section.create({ name, time });
     res.status(201).send(section);
   } catch (error) {
     console.log(error);
@@ -34,14 +36,16 @@ exports.findAll = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name, time } = req.body;
 
-    if (!name) {
-      return res.status(400).send({ message: "Section name is required!" });
+    if (!name || !time) {
+      return res
+        .status(400)
+        .send({ message: "Section name and time are required!" });
     }
 
     const [updated] = await Section.update(
-      { name },
+      { name, time },
       { where: { sectionId: id } }
     );
 
@@ -64,15 +68,17 @@ exports.update = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
     const { id } = req.params;
+    const section = await Section.findByPk(id);
 
-    const deleted = await Section.destroy({ where: { sectionId: id } });
-    if (deleted) {
-      res
-        .status(200)
-        .send({ message: `Section with ID ${id} deleted successfully.` });
-    } else {
-      res.status(404).send({ message: `Section with ID ${id} not found.` });
+    if (!section) {
+      return res
+        .status(404)
+        .send({ message: `Section with ID ${id} not found.` });
     }
+    await Section.destroy({ where: { sectionId: id } });
+    res.status(200).send({
+      message: `${section.name} deleted successfully.`,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send({ message: error.message });

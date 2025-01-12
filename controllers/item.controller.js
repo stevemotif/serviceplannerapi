@@ -4,12 +4,12 @@ const Section = db.section;
 
 exports.create = async (req, res) => {
   try {
-    const { name, description, sectionId } = req.body;
+    const { name, notes, link, time, sectionId } = req.body;
 
-    if (!name || !sectionId) {
+    if (!name || !sectionId || !time) {
       return res
         .status(400)
-        .send({ message: "Name and section ID are required!" });
+        .send({ message: "Name, section ID, and time are required!" });
     }
 
     const section = await Section.findByPk(sectionId);
@@ -19,7 +19,7 @@ exports.create = async (req, res) => {
         .send({ message: `Section with ID ${sectionId} not found.` });
     }
 
-    const item = await Item.create({ name, description, sectionId });
+    const item = await Item.create({ name, notes, link, time, sectionId });
     res.status(201).send(item);
   } catch (error) {
     console.log(error);
@@ -50,12 +50,12 @@ exports.findAll = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, sectionId } = req.body;
+    const { name, notes, link, time, sectionId } = req.body;
 
-    if (!name || !sectionId) {
+    if (!name || !sectionId || !time) {
       return res
         .status(400)
-        .send({ message: "Name and section ID are required!" });
+        .send({ message: "Name, section ID, and time are required!" });
     }
 
     const section = await Section.findByPk(sectionId);
@@ -66,7 +66,7 @@ exports.update = async (req, res) => {
     }
 
     const [updated] = await Item.update(
-      { name, description, sectionId },
+      { name, notes, link, time, sectionId },
       { where: { itemId: id } }
     );
 
@@ -95,15 +95,15 @@ exports.update = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
     const { id } = req.params;
+    const item = await Item.findByPk(id);
 
-    const deleted = await Item.destroy({ where: { itemId: id } });
-    if (deleted) {
-      res
-        .status(200)
-        .send({ message: `Item with ID ${id} deleted successfully.` });
-    } else {
-      res.status(404).send({ message: `Item with ID ${id} not found.` });
+    if (!item) {
+      return res.status(404).send({ message: `Item with ID ${id} not found.` });
     }
+    await Item.destroy({ where: { itemId: id } });
+    res.status(200).send({
+      message: `${item.name} deleted successfully.`,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send({ message: error.message });
