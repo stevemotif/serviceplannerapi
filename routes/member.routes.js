@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const memberController = require("../controllers/member.controller");
 
+router.post("/login", memberController.login);
 router.post("/", memberController.create);
 router.get("/all", memberController.findAll);
 router.put("/assign-role", memberController.assignRole);

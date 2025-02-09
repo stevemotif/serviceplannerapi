@@ -1,33 +1,90 @@
 const db = require("../models");
 const Member = db.member;
 const Role = db.role;
-
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 exports.create = async (req, res) => {
   try {
-    const { name, roleId, dateOfBirth } = req.body;
+    const { name, email, password, phoneNumber, address, roleId, dateOfBirth } =
+      req.body;
 
-    if (!name || !roleId || !dateOfBirth) {
-      return res
-        .status(400)
-        .send({ message: "Name, role ID, and date of birth are required!" });
+    if (
+      !name ||
+      !email ||
+      !password ||
+      !phoneNumber ||
+      !address ||
+      !dateOfBirth
+    ) {
+      return res.status(400).send({ message: "All fields are required!" });
     }
 
-    const role = await Role.findByPk(roleId);
-    if (!role) {
-      return res
-        .status(404)
-        .send({ message: `Role with ID ${roleId} not found.` });
+    const existingUser = await Member.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).send({ message: "Email already in use!" });
+    }
+    let roleTemp = roleId;
+    if (!roleTemp) {
+      const roletemp = await Role.findOne({ where: { level: 1 } });
+      roleTemp = roletemp.id;
+    } else {
+      const role = await Role.findByPk(roleId);
+      if (!role) {
+        return res
+          .status(404)
+          .send({ message: `Role with ID ${roleId} not found.` });
+      }
+      roleTemp = role.id;
     }
 
-    const member = await Member.create({ name, roleId, dateOfBirth });
-    res.status(201).send(member);
+    const member = await Member.create({
+      name,
+      email,
+      password,
+      phoneNumber,
+      address,
+      roleId: roleTemp,
+      dateOfBirth,
+    });
+
+    res.status(201).send({ message: "Member created successfully!", member });
   } catch (error) {
     console.log(error);
-    if (error.name === "SequelizeUniqueConstraintError") {
-      res.status(400).send({ message: "Member name must be unique!" });
-    } else {
-      res.status(500).send({ message: error.message });
+    res.status(500).send({ message: error.message });
+  }
+};
+
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res
+        .status(400)
+        .send({ message: "Email and password are required!" });
     }
+
+    const member = await Member.findOne({ where: { email } });
+    if (!member) {
+      return res.status(401).send({ message: "User does not exist!" });
+    }
+    const isMatch = await bcrypt.compare(password, member.password);
+
+    if (!isMatch) {
+      return res.status(401).send({ message: "Invalid credentials!" });
+    }
+
+    const token = jwt.sign(
+      { memberId: member.memberId, roleId: member.roleId },
+      "secretkey",
+      {
+        expiresIn: "1h",
+      }
+    );
+
+    res.status(200).send({ token, member });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: error.message });
   }
 };
 
@@ -50,12 +107,20 @@ exports.findAll = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, roleId, dateOfBirth } = req.body;
+    const { name, roleId, dateOfBirth, email, phoneNumber, address, password } =
+      req.body;
 
-    if (!name || !roleId || !dateOfBirth) {
+    if (
+      !name ||
+      !roleId ||
+      !dateOfBirth ||
+      !email ||
+      !phoneNumber ||
+      !address
+    ) {
       return res
         .status(400)
-        .send({ message: "Name, role ID, and date of birth are required!" });
+        .send({ message: "All fields except password are required!" });
     }
 
     const role = await Role.findByPk(roleId);
@@ -65,10 +130,15 @@ exports.update = async (req, res) => {
         .send({ message: `Role with ID ${roleId} not found.` });
     }
 
-    const [updated] = await Member.update(
-      { name, roleId, dateOfBirth },
-      { where: { memberId: id } }
-    );
+    let updateData = { name, roleId, dateOfBirth, email, phoneNumber, address };
+
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    const [updated] = await Member.update(updateData, {
+      where: { memberId: id },
+    });
 
     if (updated) {
       const updatedMember = await Member.findByPk(id, {
@@ -85,7 +155,7 @@ exports.update = async (req, res) => {
   } catch (error) {
     console.log(error);
     if (error.name === "SequelizeUniqueConstraintError") {
-      res.status(400).send({ message: "Member name must be unique!" });
+      res.status(400).send({ message: "Email must be unique!" });
     } else {
       res.status(500).send({ message: error.message });
     }
