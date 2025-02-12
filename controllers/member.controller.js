@@ -65,20 +65,17 @@ exports.login = async (req, res) => {
 
     const member = await Member.findOne({ where: { email } });
     if (!member) {
-      return res.status(401).send({ message: "User does not exist!" });
+      return res.status(400).send({ message: "User does not exist!" });
     }
     const isMatch = await bcrypt.compare(password, member.password);
 
     if (!isMatch) {
-      return res.status(401).send({ message: "Invalid credentials!" });
+      return res.status(400).send({ message: "Invalid credentials!" });
     }
 
     const token = jwt.sign(
       { memberId: member.memberId, roleId: member.roleId },
-      "secretkey",
-      {
-        expiresIn: "1h",
-      }
+      "secretkey"
     );
 
     res.status(200).send({ token, member });

@@ -10,8 +10,17 @@ exports.create = async (req, res) => {
         .status(400)
         .send({ message: "Church name and address are required!" });
     }
+    const member = await db.member.findByPk(req.user.memberId);
+    if (!member) {
+      return res.status(404).send({ message: "Member not found!" });
+    }
+    const church = await Church.create({
+      churchName,
+      address,
+      isActive,
+      createdBy: req.user.memberId,
+    });
 
-    const church = await Church.create({ churchName, address, isActive });
     res.status(201).send(church);
   } catch (error) {
     console.log(error);
@@ -25,7 +34,9 @@ exports.create = async (req, res) => {
 
 exports.findAll = async (req, res) => {
   try {
-    const churches = await Church.findAll();
+    const churches = await Church.findAll({
+      where: { createdBy: req.user.memberId },
+    });
     res.status(200).send(churches);
   } catch (error) {
     res.status(500).send({ message: error.message });
@@ -42,18 +53,23 @@ exports.update = async (req, res) => {
         .status(400)
         .send({ message: "Church name and address are required!" });
     }
-
-    const [updated] = await Church.update(
-      { churchName, address, isActive },
-      { where: { churchId: id } }
-    );
-
-    if (updated) {
-      const updatedChurch = await Church.findByPk(id);
-      res.status(200).send(updatedChurch);
-    } else {
-      res.status(404).send({ message: `Church with ID ${id} not found.` });
+    const member = await db.member.findByPk(req.user.memberId);
+    if (!member) {
+      return res.status(404).send({ message: "Member not found!" });
     }
+    const church = await Church.findOne({
+      where: { churchId: id, createdBy: req.user.memberId },
+    });
+
+    if (!church) {
+      return res.status(404).send({
+        message: `Church with ID ${id} not found or not owned by you.`,
+      });
+    }
+
+    await church.update({ churchName, address, isActive });
+
+    res.status(200).send(church);
   } catch (error) {
     if (error.name === "SequelizeUniqueConstraintError") {
       res.status(400).send({ message: "Church name must be unique!" });
@@ -66,12 +82,18 @@ exports.update = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
     const { id } = req.params;
+    const member = await db.member.findByPk(req.user.memberId);
+    if (!member) {
+      return res.status(404).send({ message: "Member not found!" });
+    }
+    const church = await Church.findOne({
+      where: { churchId: id, createdBy: req.user.memberId },
+    });
 
-    const church = await Church.findByPk(id);
     if (!church) {
-      return res
-        .status(404)
-        .send({ message: `Church with ID ${id} not found.` });
+      return res.status(404).send({
+        message: `Church with ID ${id} not found or not owned by you.`,
+      });
     }
 
     await Church.destroy({ where: { churchId: id } });

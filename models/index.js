@@ -11,6 +11,7 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
+
 db.church = require("./church.model")(sequelize, Sequelize);
 db.role = require("./role.model")(sequelize, Sequelize);
 db.member = require("./member.model")(sequelize, Sequelize);
@@ -18,10 +19,15 @@ db.section = require("./section.model")(sequelize, Sequelize);
 db.item = require("./item.model")(sequelize, Sequelize);
 db.service = require("./service.model")(sequelize, Sequelize);
 
+// Relationships
 db.role.hasMany(db.member, { foreignKey: "roleId", as: "members" });
 db.member.belongsTo(db.role, { foreignKey: "roleId", as: "role" });
+
 db.section.hasMany(db.item, { foreignKey: "sectionId", as: "items" });
 db.item.belongsTo(db.section, { foreignKey: "sectionId", as: "section" });
+
+db.member.hasMany(db.church, { foreignKey: "createdBy", as: "churches" });
+db.church.belongsTo(db.member, { foreignKey: "createdBy", as: "creator" });
 
 // (async () => {
 //   try {

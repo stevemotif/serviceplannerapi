@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: true,
     },
+    createdBy: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   });
 
   return Church;
