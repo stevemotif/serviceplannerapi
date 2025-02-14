@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true,
     },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -30,6 +34,18 @@ module.exports = (sequelize, DataTypes) => {
     roleId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    phoneNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    createdBy: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    adminId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
     },
   });
 

@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    adminId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   });
 
   return Church;

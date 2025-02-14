@@ -29,6 +29,28 @@ db.item.belongsTo(db.section, { foreignKey: "sectionId", as: "section" });
 db.member.hasMany(db.church, { foreignKey: "createdBy", as: "churches" });
 db.church.belongsTo(db.member, { foreignKey: "createdBy", as: "creator" });
 
+db.member.hasMany(db.church, { foreignKey: "adminId", as: "churchesAdmin" });
+db.church.belongsTo(db.member, { foreignKey: "adminId", as: "admin" });
+
+db.member.hasMany(db.member, {
+  foreignKey: "createdBy",
+  as: "createdMembers",
+});
+
+db.member.belongsTo(db.member, {
+  foreignKey: "createdBy",
+  as: "creator",
+});
+
+db.member.hasMany(db.member, {
+  foreignKey: "adminId",
+  as: "adminMember",
+});
+db.member.belongsTo(db.member, {
+  foreignKey: "adminId",
+  as: "admin",
+});
+
 // (async () => {
 //   try {
 //     await sequelize.sync({ alter: true });

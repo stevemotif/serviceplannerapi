@@ -19,6 +19,7 @@ exports.create = async (req, res) => {
       address,
       isActive,
       createdBy: req.user.memberId,
+      adminId: member.adminId || req.user.memberId,
     });
 
     res.status(201).send(church);
@@ -34,8 +35,12 @@ exports.create = async (req, res) => {
 
 exports.findAll = async (req, res) => {
   try {
+    const reqMember = await db.member.findByPk(req.user.memberId);
+    if (!reqMember) {
+      return res.status(404).send({ message: "Member not found!" });
+    }
     const churches = await Church.findAll({
-      where: { createdBy: req.user.memberId },
+      where: { adminId: reqMember.adminId || req.user.memberId },
     });
     res.status(200).send(churches);
   } catch (error) {

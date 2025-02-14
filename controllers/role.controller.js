@@ -1,5 +1,6 @@
 const db = require("../models");
 const Role = db.role;
+const { Op } = require("sequelize");
 
 exports.create = async (req, res) => {
   try {
@@ -25,7 +26,15 @@ exports.create = async (req, res) => {
 
 exports.findAll = async (req, res) => {
   try {
-    const roles = await Role.findAll();
+    const { forMembers } = req.query;
+
+    const whereCondition = {};
+    if (forMembers === "true") {
+      whereCondition.level = { [Op.ne]: 1 };
+    }
+
+    const roles = await Role.findAll({ where: whereCondition });
+
     res.status(200).send(roles);
   } catch (error) {
     res.status(500).send({ message: error.message });
