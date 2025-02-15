@@ -32,6 +32,12 @@ db.church.belongsTo(db.member, { foreignKey: "createdBy", as: "creator" });
 db.member.hasMany(db.church, { foreignKey: "adminId", as: "churchesAdmin" });
 db.church.belongsTo(db.member, { foreignKey: "adminId", as: "admin" });
 
+db.member.hasMany(db.section, { foreignKey: "adminId", as: "sectionsAdmin" });
+db.section.belongsTo(db.member, { foreignKey: "adminId", as: "admin" });
+
+db.member.hasMany(db.section, { foreignKey: "createdBy", as: "section" });
+db.section.belongsTo(db.member, { foreignKey: "createdBy", as: "creator" });
+
 db.member.hasMany(db.member, {
   foreignKey: "createdBy",
   as: "createdMembers",

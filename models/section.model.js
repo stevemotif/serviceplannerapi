@@ -14,6 +14,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TIME,
       allowNull: false,
     },
+    createdBy: { type: DataTypes.INTEGER, allowNull: true },
+    adminId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   });
 
   return Section;
